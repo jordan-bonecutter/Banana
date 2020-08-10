@@ -10,16 +10,26 @@
 #include <float.h>
 #include <time.h>
 
+int banana_random_engine_next_int(banana_random_engine* engine);
+
 /* initialize state array */
 banana_random_engine* banana_random_engine_create_with_seed(int seed){
+  banana_random_engine* seeded = malloc(sizeof *seeded);
   banana_random_engine* ret = malloc(sizeof *ret);
   uint32_t* j;
   
   srand(seed);
-  for(j = (uint32_t*)ret->x; j != (((uint32_t*)ret->x) + N); ++j){
+  for(j = (uint32_t*)seeded->x; j != (((uint32_t*)seeded->x) + N); ++j){
     *j = rand();
   }
+  seeded->i = 0;
+
+  for(j = (uint32_t*)ret->x; j != (((uint32_t*)ret->x) + N); ++j){
+    *j = banana_random_engine_next_int(seeded);
+  }
   ret->i = 0;
+
+  free(seeded);
 
   return ret;
 }
@@ -68,7 +78,7 @@ double banana_random_engine_next_float_in_range(banana_random_engine* engine, fl
   return (double)(banana_random_engine_next_float(engine)*(hi-lo) + lo);
 }
 
-// TODO: Don't use Box–Muller transform cause apparently it sucks :(
+/* TODO: Don't use Box–Muller transform cause apparently it sucks :( */
 /* use Box-Muller algorithm to transform a uniform rv to a gaussian rv */
 double banana_random_engine_next_gaussian(banana_random_engine* engine, float mean, float std_dev){
   double u1, u2;
