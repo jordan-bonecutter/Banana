@@ -97,6 +97,8 @@ int main(){
   for(i = 0; i < 100; ++i){
     printf("%d\n", array[i]);
   }
+
+  banana_random_engine_destroy(engine);
 }
 
 #endif
