@@ -10,6 +10,7 @@
 #include <float.h>
 #include <time.h>
 
+/* initialize state array */
 banana_random_engine* banana_random_engine_create_with_seed(int seed){
   banana_random_engine* ret = malloc(sizeof *ret);
   uint32_t* j;
@@ -27,14 +28,17 @@ banana_random_engine* banana_random_engine_create(){
   return banana_random_engine_create_with_seed(0);
 }
 
+/* use clock() to get a time based seed */
 banana_random_engine* banana_random_engine_create_with_timed_seed(){
   return banana_random_engine_create_with_seed((int)clock());
 }
 
+/* since bre's don't allocate any data, you only need to free them */
 void banana_random_engine_destroy(banana_random_engine* engine){
   free(engine);
 }
 
+/* do 1 iteration of mersenne twister algorithm */
 int banana_random_engine_next_int(banana_random_engine* engine){
   int i = engine->i;
   uint32_t *x = (uint32_t*)engine->x + i;
@@ -52,16 +56,20 @@ int banana_random_engine_next_int(banana_random_engine* engine){
   return y; 
 }
 
+/* genereate a 32 bit int using MT and normalize it */
 double banana_random_engine_next_float(banana_random_engine* engine){
   unsigned int nextint = banana_random_engine_next_int(engine);
   double val = nextint / (double)(0xFFFFFFFF);
   return val;
 }
 
+/* de normalize result from float */
 double banana_random_engine_next_float_in_range(banana_random_engine* engine, float lo, float hi){
   return (double)(banana_random_engine_next_float(engine)*(hi-lo) + lo);
 }
 
+// TODO: Don't use Box–Muller transform cause apparently it sucks :(
+/* use Box-Muller algorithm to transform a uniform rv to a gaussian rv */
 double banana_random_engine_next_gaussian(banana_random_engine* engine, float mean, float std_dev){
   double u1, u2;
   u1 = DBL_EPSILON;

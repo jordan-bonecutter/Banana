@@ -9,6 +9,9 @@
 
 #include <stdint.h>
 
+/* Constants from orginal MT paper table II 
+ * with generator variant MT19937 */
+
 const uint32_t U  = 0x80000000;
 const uint32_t LL = 0x7FFFFFFF;
 const int      N  = 624;
